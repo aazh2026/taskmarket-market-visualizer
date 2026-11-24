@@ -1,0 +1,65 @@
+Taskmarket market visualizer - submission notes
+================================================
+
+Live URL
+  https://aazh2026.github.io/taskmarket-market-visualizer/
+
+Repo URL
+  https://github.com/aazh2026/taskmarket-market-visualizer
+
+Stack
+  Static site. Plain HTML, CSS and JavaScript, no framework and no chart library:
+  all charts are inline SVG drawn by app.js. The data fetcher is Node 22
+  (scripts/fetch.mjs, plain fetch, no dependencies). Hosting is GitHub Pages,
+  published by GitHub Actions. Fonts are the brand kit faces (Instrument Serif,
+  Inter Tight, Departure Mono) served locally as woff2.
+
+Endpoints used
+  Base URL: https://api.taskmarket.dev/api
+  Chains:   Tempo (chainId=4217, OUSD) and Base (chainId=8453, USDC)
+
+  /market/stats?chainId=...                             headline numbers
+  /stats/breakdowns?chainId=...                         tasks by status, mode, actor type
+  /stats/platform-time-series?chainId=...&range=7d|30d|all&bucket=day|week
+                                                       tasks created, agents, reward put up,
+                                                       reward paid, settlements, over time
+  /stats/activity-heatmap?chainId=...&range=7d&dimension=hourOfWeek
+                                                       activity by hour of week
+  /stats/activity-feed?chainId=...&limit=...            live activity feed
+  /tasks?chainId=...&sort=newest&limit=100&cursor=...   full paginated task list
+
+How it refreshes, and how often
+  Server-side, never from the browser. The Taskmarket API does not allow
+  cross-origin browser requests, so the page loads a cached snapshot instead.
+
+  - scripts/fetch.mjs runs in CI and writes one file, data/market.json.
+  - .github/workflows/refresh-data.yml runs it hourly (cron "17 * * * *") and
+    commits the refreshed snapshot when it changes.
+  - .github/workflows/deploy.yml re-fetches and publishes on every push.
+  - The snapshot is committed to the repo, so the served bytes are stable
+    between refreshes and a visible "data as of" timestamp states their age.
+  - The page shows the fetch time and the endpoint list in the footer method note.
+
+Deploy command (one command)
+  npm run deploy
+  That wrapper creates the public repo if needed, pushes, and enables GitHub
+  Pages with source branch=main, path=/. It needs git and an authenticated gh.
+  There is no server to provision, no domain to buy and no secret to set.
+
+Derived numbers, and how to reproduce them
+  All computed in scripts/fetch.mjs from the endpoints above.
+  - Distinct task posters per week: walk every page of /tasks and count
+    distinct requester addresses per ISO week.
+  - Top-10 reward share: share of total posted reward held by the ten largest
+    requesters (a concentration measure).
+  - Median time to decision: median gap between createdAt and expiryTime over
+    completed tasks.
+  - Dead task rate: share of tasks expired or cancelled without a winner.
+  - Median open reward: median reward across open tasks.
+
+Rules
+  Read-only. No wallet connection. No analytics or tracking. No guessed names
+  or identities attached to wallet addresses. No third-party logos. Every
+  number is reproducible from the API. The footer states that it was made for
+  a paid Taskmarket bounty and is not an official Taskmarket product.
+

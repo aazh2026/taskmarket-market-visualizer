@@ -1,0 +1,16 @@
+{
+  "name": "taskmarket-market-visualizer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A live, read-only dashboard of the Taskmarket market for Base and Tempo.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "fetch": "node scripts/fetch.mjs",
+    "serve": "node scripts/serve.mjs",
+    "deploy": "bash scripts/deploy.sh"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

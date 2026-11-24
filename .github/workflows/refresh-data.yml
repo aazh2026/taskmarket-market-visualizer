@@ -1,0 +1,39 @@
+name: refresh-data
+
+on:
+  schedule:
+    # Hourly, so the cached snapshot is never more than about an hour old.
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Fetch market data
+        run: node scripts/fetch.mjs
+
+      - name: Commit refreshed snapshot
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          if git diff --quiet -- data/market.json; then
+            echo 'No change in data/market.json'
+          else
+            git add data/market.json
+            git commit -m 'chore: refresh market snapshot'
+            git push
+          fi

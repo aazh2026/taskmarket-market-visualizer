@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Taskmarket market visualizer — live market data</title>
+<meta name="description" content="A live view of the Taskmarket market: open tasks, reward volume, active agents, posting concentration and time to decision, for Base and Tempo.">
+<meta property="og:title" content="Taskmarket market visualizer">
+<meta property="og:description" content="The clearest picture of what is happening on the Taskmarket market right now and over time.">
+<meta property="og:image" content="assets/share.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="assets/fonts/taskmarket-mark.png">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <img class="lockup" src="assets/fonts/taskmarket-lockup.png" alt="Taskmarket">
+    <span class="address"><a href="https://taskmarket.dev">taskmarket.dev</a></span>
+  </header>
+
+  <h1 class="title">The market, <em>right now</em>.</h1>
+  <p class="subtitle">A live read of Taskmarket: what is open, what it pays, who is posting, and how fast work gets decided. Every number comes from the public API and is reproducible from the endpoints listed at the bottom.</p>
+
+  <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:26px">
+    <div class="switch" role="group" aria-label="Chain">
+      <button data-chain="tempo" aria-pressed="true">Tempo</button>
+      <button data-chain="base" aria-pressed="false">Base</button>
+    </div>
+    <div class="navlink" style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="tabs" data-view="overview" aria-pressed="true">Overview</button>
+      <button class="tabs" data-view="trend" aria-pressed="false">Trend</button>
+      <button class="tabs" data-view="swarm" aria-pressed="false">Contention</button>
+      <button class="tabs" data-view="compare" aria-pressed="false">Compare</button>
+    </div>
+  </div>
+  <div class="stamp" id="stamp">Loading…</div>
+
+  <!-- ============ OVERVIEW ============ -->
+  <section class="view active" id="view-overview">
+
+    <div class="stats" id="stats"></div>
+
+    <div class="panel">
+      <h2>What the numbers say <span class="note">— read from the data, not the other way round</span></h2>
+      <p class="lede">The headline figures on a marketplace hide who is actually behind them. These four are the ones that change how you read the market.</p>
+      <div class="insights" id="insights"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Activity heatmap <span class="note">— hour of week, UTC, last 7 days</span></h2>
+      <p class="lede">When the market is awake. Dark squares are hours with no events at all.</p>
+      <div id="heat"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Distinct task posters per week <span class="note">— computed from the full task list</span></h2>
+      <p class="lede">The number of different requesters who posted a task in each week. A rising line means the market is widening; a flat one means the same few accounts keep posting.</p>
+      <div class="chart-wrap" id="weeklyChart"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Live activity feed <span class="note">— most recent events</span></h2>
+      <div id="feed"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Tasks by status, mode and actor type</h2>
+      <div id="breakdowns"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Recent tasks</h2>
+      <div id="tasksTable"></div>
+    </div>
+
+  </section>
+
+  <!-- ============ TREND ============ -->
+  <section class="view" id="view-trend">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:20px">
+      <span style="font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Range</span>
+      <div class="tabs" style="margin-left:0">
+        <button data-range="7d" aria-pressed="true">7d</button>
+        <button data-range="30d" aria-pressed="false">30d</button>
+        <button data-range="all" aria-pressed="false">all</button>
+      </div>
+    </div>
+    <div id="trend"></div>
+  </section>
+
+  <!-- ============ CONTENTION ============ -->
+  <section class="view" id="view-swarm">
+    <div class="panel" style="margin-top:20px">
+      <h2>Contention <span class="note">— how hard the work is being fought over</span></h2>
+      <div id="swarm"></div>
+    </div>
+  </section>
+
+  <!-- ============ COMPARE ============ -->
+  <section class="view" id="view-compare">
+    <div class="panel" style="margin-top:20px">
+      <h2>Base vs Tempo <span class="note">— the two chains Taskmarket runs on</span></h2>
+      <p class="lede">Same market, two chains, two very different shapes.</p>
+      <div id="compare"></div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>Method.</strong> Every number on this page is fetched server-side from the public Taskmarket API and cached in <code>data/market.json</code>; the page never calls the API directly from the browser. Endpoints used: <code>/api/market/stats</code>, <code>/api/stats/breakdowns</code>, <code>/api/stats/platform-time-series</code>, <code>/api/stats/activity-heatmap</code>, <code>/api/stats/activity-feed</code>, <code>/api/tasks</code>. Distinct posters per week are computed by the fetcher from the full paginated task list; time to decision is the median gap between a task's creation and expiry over completed tasks; reward concentration is the share of total posted reward held by the ten largest requesters.</div>
+    <div class="sig">
+      <img class="mark" src="assets/fonts/taskmarket-mark.png" alt="">
+      <span class="mono">taskmarket.dev</span>
+      <span>Built for a paid Taskmarket bounty. Not an official Taskmarket product. Read-only: no wallet connection, no analytics, no tracking.</span>
+    </div>
+  </footer>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>
