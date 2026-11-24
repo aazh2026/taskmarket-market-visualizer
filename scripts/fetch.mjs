@@ -58,11 +58,12 @@ async function fetchAllTasks(chainId) {
 }
 
 async function chainData(chain) {
-  const [stats, breakdowns, series7, series30, seriesAll, heatmap, feed, tasks] = await Promise.all([
+  const [stats, breakdowns, series7, series30, series90, seriesAll, heatmap, feed, tasks] = await Promise.all([
     get(`market/stats?chainId=${chain.id}`),
     get(`stats/breakdowns?chainId=${chain.id}`),
     get(`stats/platform-time-series?chainId=${chain.id}&range=7d&bucket=day`),
     get(`stats/platform-time-series?chainId=${chain.id}&range=30d&bucket=day`),
+    get(`stats/platform-time-series?chainId=${chain.id}&range=90d&bucket=day`),
     get(`stats/platform-time-series?chainId=${chain.id}&range=all&bucket=week`),
     get(`stats/activity-heatmap?chainId=${chain.id}&range=7d&dimension=hourOfWeek`),
     get(`stats/activity-feed?chainId=${chain.id}&limit=40`),
@@ -120,7 +121,7 @@ async function chainData(chain) {
     label: chain.label,
     stats,
     breakdowns,
-    series: { '7d': series7, '30d': series30, all: seriesAll },
+    series: { '7d': series7, '30d': series30, '90d': series90, all: seriesAll },
     heatmap,
     feed,
     weekly,
