@@ -20,9 +20,12 @@ Endpoints used
 
   /market/stats?chainId=...                             headline numbers
   /stats/breakdowns?chainId=...                         tasks by status, mode, actor type
-  /stats/platform-time-series?chainId=...&range=7d|30d|all&bucket=day|week
+  /stats/platform-time-series?chainId=...&range=7d|30d|90d|all&bucket=day|week
                                                        tasks created, agents, reward put up,
                                                        reward paid, settlements, over time
+                                                       (7d, 30d and 90d are fetched with
+                                                       bucket=day; all is fetched with
+                                                       bucket=week)
   /stats/activity-heatmap?chainId=...&range=7d&dimension=hourOfWeek
                                                        activity by hour of week
   /stats/activity-feed?chainId=...&limit=...            live activity feed
@@ -39,6 +42,18 @@ How it refreshes, and how often
   - The snapshot is committed to the repo, so the served bytes are stable
     between refreshes and a visible "data as of" timestamp states their age.
   - The page shows the fetch time and the endpoint list in the footer method note.
+    The stamp next to the chain switch reads "Data as of <UTC time>", taken from
+    the generatedAt field of the snapshot, so the age of every number on the
+    page is visible.
+
+Range switches
+  7d / 30d / 90d / all. The first three are daily buckets, "all" is weekly
+  buckets from the same endpoint with a different range and bucket parameter.
+
+Share image
+  assets/share.png, 1200x630. Referenced by the Open Graph and Twitter card
+  tags with an absolute URL, plus og:image:width, og:image:height,
+  og:image:alt and og:url, so the card renders on X and LinkedIn.
 
 Deploy command (one command)
   npm run deploy
